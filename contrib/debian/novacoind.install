@@ -1,0 +1,2 @@
+debian/bin/tennetd usr/bin
+src/tennetd usr/lib/tennet
