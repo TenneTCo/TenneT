@@ -45,11 +45,11 @@ CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16); // TenneT - PoW starting d
 static const int64_t nTargetTimespan = 16 * 60;  // 16 minutes
 
 unsigned int nTargetSpacing = 2 * 60; // 2 minutes
-unsigned int nStakeMinAge = 2 * 60 * 60; // 2 hours
-unsigned int nStakeMaxAge = 2 * 24 * 60 * 60; // 2 days
+unsigned int nStakeMinAge = 20 * 60 * 60; // 20 hours
+unsigned int nStakeMaxAge = 20 * 24 * 60 * 60; // 20 days
 unsigned int nModifierInterval = 10 * 60; // 10 minutes
 
-int nCoinbaseMaturity = 10;
+int nCoinbaseMaturity = 0; // 10 in total
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 
@@ -997,11 +997,35 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
     int64_t nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);  //200% yearly interest
-    if(pindexBest->nHeight < 4000)
+    if(pindexBest->nHeight < 1500)
+    {
+        nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);  //200% yearly interest
+    }
+    if(pindexBest->nHeight < 1600)
     {
         nSubsidy = 200 * COIN;
     }
-    else if(pindexBest->nHeight > 4000)
+    else if(pindexBest->nHeight < 2000)
+    {
+        nSubsidy = 10 * COIN; 
+    }
+    else if(pindexBest->nHeight < 2010)
+    {
+        nSubsidy = 50 * COIN; 
+    }
+    else if(pindexBest->nHeight < 2020)
+    {
+        nSubsidy = 25 * COIN;
+    } 
+    else if(pindexBest->nHeight < 2025)
+    {
+        nSubsidy = 125 * COIN; 
+    }
+    else if(pindexBest->nHeight < 3025)
+    {   
+        nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 7) * 10;  //2000% yearly interest
+    }
+    else if(pindexBest->nHeight > 3025)
     {   
         nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 7);  //200% yearly interest
     }
