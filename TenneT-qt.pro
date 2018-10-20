@@ -1,21 +1,26 @@
 # TenneT (The CryptoCurrency in Business) Version
 TEMPLATE = app
 TARGET = TenneT-qt
-VERSION = 1.1
+VERSION = 1.3
 INCLUDEPATH += src src/json src/qt src/tor
 QT += core gui network
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+DEFINES += STATIC
 CONFIG += no_include_pwd
 CONFIG += thread
 CONFIG += static
 
 QMAKE_CXXFLAGS = -fpermissive
+QT += core gui network widgets
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
+greaterThan(QT_MAJOR_VERSION, 4)
+{
+QT += widgets
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 }
-
 # for boost 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
@@ -374,7 +379,7 @@ OTHER_FILES += \
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     macx:BOOST_LIB_SUFFIX = -mt
-    windows:BOOST_LIB_SUFFIX = -mgw49-mt-s-1_57
+    windows:BOOST_LIB_SUFFIX = -mgw48-mt-s-1_55
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -419,7 +424,7 @@ macx:HEADERS += src/qt/macdockiconhandler.h
 macx:OBJECTIVE_SOURCES += src/qt/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
-macx:ICON = src/qt/res/icons/TenneT.icns
+macx:ICON = src/qt/res/icons/tennet.icns
 macx:TARGET = "TenneT-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
