@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// changes by DarkTron
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -45,11 +46,11 @@ CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16); // TenneT - PoW starting d
 static const int64_t nTargetTimespan = 16 * 60;  // 16 minutes
 
 unsigned int nTargetSpacing = 2 * 60; // 2 minutes
-unsigned int nStakeMinAge = 20 * 60 * 60; // 20 hours
-unsigned int nStakeMaxAge = 20 * 24 * 60 * 60; // 20 days
+unsigned int nStakeMinAge = 20 * 60; // 20 minutes
+unsigned int nStakeMaxAge = 2 * 24 * 60 * 60; // 2 days
 unsigned int nModifierInterval = 10 * 60; // 10 minutes
 
-int nCoinbaseMaturity = 0; // 10 in total
+int nCoinbaseMaturity = 0;
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 
@@ -996,40 +997,19 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
-    int64_t nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);  //200% yearly interest
-    if(pindexBest->nHeight < 1500)
-    {
-        nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);  //200% yearly interest
-    }
-    if(pindexBest->nHeight < 1600)
+    int64_t nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);  //2% yearly interest
+        if(pindexBest->nHeight < 1500)
     {
         nSubsidy = 200 * COIN;
     }
-    else if(pindexBest->nHeight < 2000)
-    {
-        nSubsidy = 10 * COIN; 
-    }
-    else if(pindexBest->nHeight < 2010)
-    {
-        nSubsidy = 50 * COIN; 
-    }
-    else if(pindexBest->nHeight < 2020)
-    {
-        nSubsidy = 25 * COIN;
-    } 
-    else if(pindexBest->nHeight < 2025)
-    {
-        nSubsidy = 125 * COIN; 
-    }
-    else if(pindexBest->nHeight < 3025)
+    else if(pindexBest->nHeight < 26000)
     {   
-        nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 7) * 10;  //2000% yearly interest
+        nSubsidy = 200 * COIN;
     }
-    else if(pindexBest->nHeight > 3025)
+    else if(pindexBest->nHeight < 26000000000)
     {   
-        nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 7);  //200% yearly interest
+        nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 7);  //2% yearly interest
     }
-
     if (fDebug && GetBoolArg("-printcreation"))
         printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
 
@@ -2143,6 +2123,9 @@ bool CBlock::AcceptBlock()
         return DoS(10, error("AcceptBlock() : prev block not found"));
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
+
+    if (IsProofOfWork() && nHeight > LAST_POW_BLOCK)
+        return DoS(100, error("AcceptBlock() : reject proof-of-work at height %d", nHeight));
         
     if (IsProofOfStake() && nHeight < MODIFIER_INTERVAL_SWITCH)
         return DoS(100, error("AcceptBlock() : reject proof-of-stake at height %d", nHeight));
